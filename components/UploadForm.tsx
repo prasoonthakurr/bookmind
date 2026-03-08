@@ -146,7 +146,15 @@ const UploadForm: React.FC = () => {
             ) : (
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
-                  {coverPreview && <Image src={coverPreview} alt="cover preview" className="h-14 w-10 object-cover rounded" />}
+                  {coverPreview && (
+                    <Image
+                      src={coverPreview}
+                      alt="cover preview"
+                      width={40}
+                      height={56}
+                      className="object-cover rounded"
+                    />
+                  )}
                   <div className="truncate">{coverFile.name}</div>
                 </div>
                 <button type="button" onClick={removeCover} className="text-sm text-red-600">Remove</button>
