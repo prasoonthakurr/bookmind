@@ -1,6 +1,6 @@
 'use server';
 
-import {CreateBook, TextSegment} from "@/types";
+import {CreateBook, IBook, IBookSegment, TextSegment} from "@/types";
 import {connectToDB} from "@/database/mongoose";
 import {escapeRegex, generateSlug, serializeData} from "@/lib/utils";
 import Book from "@/database/models/book.model";
@@ -24,7 +24,7 @@ export const getAllBooks = async (search?: string) => {
             };
         }
 
-        const books = await Book.find(query).sort({ createdAt: -1 }).lean();
+        const books = await Book.find(query).sort({ createdAt: -1 }).lean<IBook | null>();
 
         return {
             success: true,
@@ -44,12 +44,12 @@ export const checkBookExists = async (title: string) => {
 
         const slug = generateSlug(title);
 
-        const existingBook = await Book.findOne({slug}).lean();
+        const existingBook = await Book.findOne({slug}).lean<IBook | null>();
 
         if(existingBook) {
             return {
                 exists: true,
-                book: serializeData(existingBook)
+                data: serializeData(existingBook)
             }
         }
 
@@ -70,7 +70,7 @@ export const createBook = async (data: CreateBook) => {
 
         const slug = generateSlug(data.title);
 
-        const existingBook = await Book.findOne({slug}).lean();
+        const existingBook = await Book.findOne({slug}).lean<IBook | null>();
 
         if(existingBook) {
             return {
@@ -127,7 +127,7 @@ export const getBookBySlug = async (slug: string) => {
     try {
         await connectToDB();
 
-        const book = await Book.findOne({ slug }).lean();
+        const book = await Book.findOne({ slug }).lean<IBook>();
 
         if (!book) {
             return { success: false, error: 'Book not found' };
@@ -185,7 +185,7 @@ export const searchBookSegments = async (bookId: string, query: string, limit: n
         const bookObjectId = new mongoose.Types.ObjectId(bookId);
 
         // Try MongoDB text search first (requires text index)
-        let segments: Record<string, unknown>[] = [];
+        let segments: IBookSegment[] = [];
         try {
             segments = await BookSegment.find({
                 bookId: bookObjectId,
@@ -194,7 +194,7 @@ export const searchBookSegments = async (bookId: string, query: string, limit: n
                 .select('_id bookId content segmentIndex pageNumber wordCount')
                 .sort({ score: { $meta: 'textScore' } })
                 .limit(limit)
-                .lean();
+                .lean<IBookSegment[]>();
         } catch {
             // Text index may not exist — fall through to regex fallback
             segments = [];
@@ -212,7 +212,7 @@ export const searchBookSegments = async (bookId: string, query: string, limit: n
                 .select('_id bookId content segmentIndex pageNumber wordCount')
                 .sort({ segmentIndex: 1 })
                 .limit(limit)
-                .lean();
+                .lean<IBookSegment[]>();
         }
 
         console.log(`Search complete. Found ${segments.length} results`);

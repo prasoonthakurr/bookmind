@@ -4,7 +4,7 @@ import { getAllBooks } from "@/lib/actions/book.actions"
 
 const page = async () => {
   const bookResults = await getAllBooks();
-  const books = bookResults.success ? bookResults.data ?? [] : [];
+  const books = bookResults.success && Array.isArray(bookResults.data) ? bookResults.data : [];
   return (
     <main className="wrapper container">
       <Hero />
