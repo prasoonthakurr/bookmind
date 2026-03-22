@@ -2,6 +2,14 @@ import { TextSegment } from '@/types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { DEFAULT_VOICE, voiceOptions } from './constants';
+import type { PageViewport } from 'pdfjs-dist';
+
+interface PDFRenderParameters {
+  canvasContext: CanvasRenderingContext2D;
+  viewport: PageViewport;
+  canvas: HTMLCanvasElement;
+  background?: string;
+}
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -125,7 +133,7 @@ export async function parsePDFFile(file: File) {
       canvasContext: context,
       viewport: viewport,
       canvas: canvas,
-    }).promise;
+    } as PDFRenderParameters).promise;
 
     // Convert canvas to data URL
     const coverDataURL = canvas.toDataURL('image/png');
