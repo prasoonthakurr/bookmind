@@ -1,0 +1,55 @@
+'use client';
+
+import {useEffect, useState} from 'react';
+import {Input} from "@/components/ui/input";
+import {Search as SearchIcon} from "lucide-react";
+import {usePathname, useRouter} from "next/navigation";
+
+const Search = () => {
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const getInitialQuery = () => {
+        if (typeof window === 'undefined') return '';
+        const params = new URLSearchParams(window.location.search);
+        return params.get('query') || '';
+    };
+
+    const [query, setQuery] = useState(getInitialQuery);
+
+    useEffect(() => {
+        const delayDebounceFn = setTimeout(() => {
+            const params = new URLSearchParams(window.location.search);
+
+            if (query) {
+                params.set('query', query);
+            } else {
+                params.delete('query');
+            }
+
+            router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [query, pathname, router]);
+
+    return (
+        <div className="library-search-wrapper">
+            <div className="pl-4">
+                <SearchIcon
+                    size={20}
+                    className="text-[var(--text-muted)]"
+                />
+            </div>
+            <Input
+                type="text"
+                placeholder="Search books by title or author"
+                className="library-search-input border-none shadow-none focus-visible:ring-0"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+            />
+        </div>
+    );
+};
+
+export default Search;
