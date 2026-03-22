@@ -11,11 +11,7 @@ import {useRouter} from "next/navigation";
 import {useEffect} from "react";
 
 const VapiControls = ({ book }: { book: IBook }) => {
-    const { status, isActive, messages, currentMessage, currentUserMessage, duration, start, stop, clearError, limitError } = useVapi(book)
-
-    const isBillingError = false;
-    const maxDurationSeconds = 2 * 60;
-
+    const { status, isActive, messages, currentMessage, currentUserMessage, duration, start, stop, clearError, limitError, isBillingError, maxDurationSeconds } = useVapi(book)
     const router = useRouter();
 
     useEffect(() => {
@@ -47,6 +43,11 @@ const VapiControls = ({ book }: { book: IBook }) => {
         }
     };
 
+    const getIcon = () => {
+        if (isActive) return <Mic className="size-7 text-white" />;
+        return <MicOff className="size-7 text-[#212a3b]" />;
+    };
+
     const statusDisplay = getStatusDisplay();
 
     return (
@@ -64,19 +65,15 @@ const VapiControls = ({ book }: { book: IBook }) => {
                             priority
                         />
                         <div className="vapi-mic-wrapper relative">
-                            {isActive && (status === 'speaking' || status === 'thinking') && (
-                                <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-75" />
+                            {isActive && (
+                                <div className="absolute inset-0 rounded-full bg-white animate-ping opacity-50 z-0" />
                             )}
                             <button
                                 onClick={isActive ? stop : start}
                                 disabled={status === 'connecting'}
                                 className={`vapi-mic-btn shadow-md !w-[60px] !h-[60px] z-10 ${isActive ? 'vapi-mic-btn-active' : 'vapi-mic-btn-inactive'}`}
                             >
-                                {isActive ? (
-                                    <Mic className="size-7 text-white" />
-                                ) : (
-                                    <MicOff className="size-7 text-[#212a3b]" />
-                                )}
+                                {getIcon()}
                             </button>
                         </div>
                     </div>
