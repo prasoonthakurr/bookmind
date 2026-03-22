@@ -425,7 +425,7 @@
     }
   }
   .vapi-mic-btn-active {
-    @apply bg-white;
+    @apply bg-black;
   }
   .vapi-mic-btn-inactive {
     @apply bg-white;
